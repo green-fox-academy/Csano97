@@ -5,3 +5,4 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(DataStructures ListIntroduction1.cpp)
 add_executable(MapIntroduction1 MapIntroduction1.cpp)
+add_executable(Listintro ListIntroduction2.cpp)
