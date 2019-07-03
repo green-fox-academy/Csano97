@@ -7,13 +7,13 @@ void center(SDL_Renderer *gRenderer, int, int);
 void draw(SDL_Renderer *gRenderer) {
     int x  = 7;
     int y = 7;
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 6; ++i) {
         center(gRenderer, x, y);
         x += 125;
-        y += 125;
+        y += 25;
     }
 }
 void center(SDL_Renderer *gRenderer, int x, int y){
     SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
-    SDL_RenderDrawLine(gRenderer, x, y, 512, 310);
+    SDL_RenderDrawLine(gRenderer, x, y, 360, 360);
 }

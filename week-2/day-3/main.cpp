@@ -1,10 +1,14 @@
 #include <iostream>
 #include <SDL.h>
 #include "draw.h"
+#include <ctime>
+#include <cstdlib>
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 1024;
+const int SCREEN_WIDTH = 720;
 const int SCREEN_HEIGHT = 720;
+
+bool isdrawcomp = false;
 
 //Starts up SDL and creates window
 bool init();
@@ -57,6 +61,7 @@ void close() {
 }
 
 int main(int argc, char *args[]) {
+    srand(time (nullptr));
     //Start up SDL and create window
     if (!init()) {
         std::cout << "Failed to initialize!" << std::endl;
@@ -81,13 +86,16 @@ int main(int argc, char *args[]) {
         }
 
         //Clear screen
-        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        SDL_RenderClear(gRenderer);
+        if(!isdrawcomp) {
+            SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+            SDL_RenderClear(gRenderer);
 
-        draw(gRenderer);
+            draw(gRenderer);
 
-        //Update screen
-        SDL_RenderPresent(gRenderer);
+            //Update screen
+            SDL_RenderPresent(gRenderer);
+        isdrawcomp = true;
+        }
     }
 
     //Free resources and close SDL
