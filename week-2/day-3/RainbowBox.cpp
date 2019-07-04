@@ -21,8 +21,8 @@ void draw(SDL_Renderer *gRenderer)
 
 void fillwithsquares(SDL_Renderer *gRenderer, int size, int color)
 {
-    int x = SCREEN_WIDTH / 2 - size;
-    int y = SCREEN_HEIGHT / 2 - size;
+    int x;
+    int y;
     while (size < SCREEN_WIDTH && size < SCREEN_HEIGHT) {
         x = SCREEN_WIDTH / 2 - size / 2;
         y = SCREEN_HEIGHT / 2 - size / 2;
