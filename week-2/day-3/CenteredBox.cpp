@@ -25,6 +25,6 @@ void rectangle(SDL_Renderer *gRenderer, int s)
     int x = SCREEN_WIDTH / 2 - s / 2;
     int y = SCREEN_HEIGHT / 2 -s / 2;
     SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
-    SDL_Rect SDL_RectEmpty = {x, y, s, s};
-    SDL_RenderDrawRect(gRenderer, &SDL_RectEmpty);
+    SDL_Rect emptybox = {x, y, s, s};
+    SDL_RenderDrawRect(gRenderer, &emptybox);
 }
