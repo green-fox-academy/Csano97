@@ -5,8 +5,8 @@
 #include <cstdlib>
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 720;
-const int SCREEN_HEIGHT = 720;
+const int SCREEN_WIDTH = 650;
+const int SCREEN_HEIGHT = 650;
 
 bool isdrawcomp = false;
 

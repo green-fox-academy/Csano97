@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-std::string reverse(const std::string& text);
+std::string reverse(std::string text);
 
 int main(int argc, char* args[])
 {
@@ -16,7 +16,7 @@ int main(int argc, char* args[])
 
     return 0;
 }
-std::string reverse(const std::string& text){
+std::string reverse(std::string text){
     std::string temp;
     for (int i = 1; i < text.length()+1; ++i) {
         temp += text.at(text.length()-i);

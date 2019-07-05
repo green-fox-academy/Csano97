@@ -1,15 +1,21 @@
 #include <iostream>
 
 int main(){
-    int a = 0;
-    std::cout << "Give a size number:";
-    std::cin >> a;
-    int matrix[][a] = {0, 1};
+    int matrix[][4] = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0},
+            {0, 0, 0, 1}
+    };
+    std::cout << matrix[0][0] << std::endl;
+    int soize = sizeof(matrix) / sizeof(matrix[0][0]);
+    for (int i = 0; i < soize; ++i) {
+        for (int j = 0; j < soize; ++j) {
 
-    for (int i = 0; i < a; ++i) {
-        std::cout << matrix[i] << std::endl;
 
-    }
+            std::cout << matrix[i][j] << std::endl;
+        }
+        }
 
     return 0;
 }
