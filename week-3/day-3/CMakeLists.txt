@@ -5,3 +5,4 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(PostIt PostItmain.cpp)
 add_executable(Blogpost Blogpost.cpp BlogpostClass.cpp BlogpostClass.h)
+add_executable(animal Animal.cpp AnimalClass.cpp AnimalClass.h)
