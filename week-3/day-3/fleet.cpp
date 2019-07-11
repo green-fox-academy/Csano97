@@ -1,7 +1,7 @@
 
 #include "fleet.h"
 
-Fleet::Fleet() {}
+Fleet::Fleet() = default;
 
 void Fleet::add(const Thing& thing)
 {
