@@ -7,7 +7,9 @@ class Pokemon {
 public:
     Pokemon(const std::string& name, const std::string& type, const std::string& effectiveAgainst);
     bool isEffectiveAgainst(Pokemon anotherPokemon);
-    std::string getName();
+
+    const std::string &getName() const;
+
 
 private:
     std::string _name;

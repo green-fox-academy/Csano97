@@ -30,9 +30,13 @@ int main(int argc, char* args[])
     Pokemon wildPokemon("Oddish", "leaf", "water");
 
     // Which pokemon should Ash use?
-    Pokemon chosen("Charizard", "fire", "leaf");
+    std::string name;
+    for (int i = 0; i < pokemonOfAsh.size(); ++i){
+         if(pokemonOfAsh[i].isEffectiveAgainst(wildPokemon)){
+             name = pokemonOfAsh[i].getName();
+         }
+    }
 
-
-    std::cout << "I choose You, " << chosen.getName() << "\n" << "Ash won: " << std::boolalpha << chosen.isEffectiveAgainst(wildPokemon) << std::endl;
+    std::cout << "I choose You, " << name <<  std::endl;
     return 0;
 }
