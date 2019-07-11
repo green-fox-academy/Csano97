@@ -9,3 +9,4 @@ add_executable(animal Animal.cpp AnimalClass.cpp AnimalClass.h SharpiePen.cpp Sh
 add_executable(sharpie Sharpie.cpp SharpiePen.cpp SharpiePen.h)
 add_executable(Counter CounterTest.cpp counter.cpp counter.h)
 add_executable(Pokemon PokemonMain.cpp pokemon.cpp pokemon.h)
+add_executable(Fleet FleetThings.cpp fleet.cpp fleet.h thing.cpp thing.h)
