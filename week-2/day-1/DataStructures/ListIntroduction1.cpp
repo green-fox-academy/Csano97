@@ -20,11 +20,11 @@ int main()
     std::cout << "" << std::endl;
     for (int i = 0; i < names.size(); i++) {
 
-            std::cout << i+1 << ". " << names[i] << std::endl;
+        std::cout << i + 1 << ". " << names[i] << std::endl;
     }
-    names.erase(names.begin()+1);
+    names.erase(names.begin() + 1);
     std::cout << "" << std::endl;
-    for (int i = 1; i < names.size()+1; --i) {
+    for (int i = 1; i < names.size() + 1; --i) {
         std::cout << names[i] << std::endl;
     }
     names.clear();
