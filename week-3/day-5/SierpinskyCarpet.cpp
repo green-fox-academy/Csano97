@@ -27,7 +27,7 @@ void drawRectangle(SDL_Renderer *gRenderer, int x1, int y1, int a, int b, int de
             {255, 127, 0},
             {255, 0 , 0}
     };
-    SDL_SetRenderDrawColor(gRenderer, colors[depth][0], colors[depth][1], colors[depth][2], 0xFF);
+    SDL_SetRenderDrawColor(gRenderer, colors[depth][0], colors[depth][1], colors[depth][2], 255);
     SDL_Rect fillRect = {(x1 + a) / 3, (y1 + b) / 3, a / 3, b / 3};
     SDL_RenderFillRect(gRenderer, &fillRect);
     drawRectangle(gRenderer, x1, y1, a / 3, b / 3, depth + 1);
