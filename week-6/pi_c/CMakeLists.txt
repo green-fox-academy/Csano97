@@ -3,4 +3,4 @@ project(pi_c C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(pi_c main.c)
+add_executable(pi_c main.c Separate.h)
