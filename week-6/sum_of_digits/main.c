@@ -12,20 +12,19 @@ int main()
     return 0;
 }
 int sum_of_digits(int a, int b){
-    int sum_a;
-    int sum_b;
-    int remains_a;
-    int remains_b;
+    int sum_a = 0;
+    int sum_b = 0;
+    int remains;
     while(a != 0){
-        remains_a = a % 10;
-        sum_a = sum_a + remains_a;
+        remains = a % 10;
+        sum_a = sum_a + remains;
         a = a / 10;
     }
     while(b != 0){
-        remains_b = a % 10;
-        sum_b = sum_b + remains_b;
+        remains = b % 10;
+        sum_b = sum_b + remains;
         b = b / 10;
-    }if(a == b){
+    }if(sum_a == sum_b){
         return 1;
     }
     return 0;
