@@ -9,6 +9,7 @@ int main()
     char word_of_the_day[10] = "Apple\n";
     int number_of_the_day = 10;
     write_multiple(my_file, word_of_the_day, number_of_the_day);
+    fclose(my_file);
     return 0;
 }
 void write_multiple(FILE * file, char* word, int number_of_times){
