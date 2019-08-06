@@ -12,10 +12,9 @@ int main()
         return 1;
     }
     char read[256];
-    int i=0;
     while(fgets(read, 256, my_file)) {
-        printf("%d. line: %s", i+1, read);
-        ++i;
+        printf("%s", read);
     }
+    fclose(my_file);
     return 0;
 }
