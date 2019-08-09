@@ -13,6 +13,8 @@ typedef struct vector
 
 void vector_init(vector_t*);
 void push_back(vector_t *vector, int data);
+void pop_back(vector_t *vector);
+void erase_element(vector_t *vector, int index);
 void print_vector(vector_t *vector);
 void erase(vector_t *vector);
 

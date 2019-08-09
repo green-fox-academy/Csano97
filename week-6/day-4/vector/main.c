@@ -16,6 +16,12 @@ int main()
     push_back(&vector, 45);
     push_back(&vector, 50);
     push_back(&vector, 55);
+//    print_vector(&vector);
+//    pop_back(&vector);
+    print_vector(&vector);
+    erase_element(&vector, 3);
+    print_vector(&vector);
+    erase_element(&vector, 5);
     print_vector(&vector);
     erase(&vector);
     print_vector(&vector);

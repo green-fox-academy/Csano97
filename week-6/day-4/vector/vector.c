@@ -25,16 +25,32 @@ void push_back(vector_t *vector, int data)
     }
 }
 
+void pop_back(vector_t *vector)
+{
+    vector->current_size = vector->current_size - 1;
+}
+
+void erase_element(vector_t *vector, int index)
+{
+
+    for (int i = index; i < vector->current_size; ++i) {
+        vector->data[i] = vector->data[i + 1];
+    }
+    vector->current_size--;
+}
+
 void print_vector(vector_t *vector)
 {
-    if(vector->data == NULL){
-        printf("vector is empty\n");
+    if (vector->data == NULL) {
         return;
     }
     for (int i = 0; i < vector->current_size; ++i) {
-        printf("%d\n", vector->data[i]);
+        printf("%d ", vector->data[i]);
     }
+    printf("\n");
 }
-void erase(vector_t *vector){
+
+void erase(vector_t *vector)
+{
     vector->data = realloc(vector->data, 0);
 }
