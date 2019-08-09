@@ -24,6 +24,15 @@ void push_back(vector_t *vector, int data)
         vector->current_size++;
     }
 }
+void insert(vector_t *vector, int index, int element){
+    if(vector->current_size == vector->capacity){
+        vector->capacity = vector->current_size * 2;
+        vector->data = realloc(vector->data, vector->capacity * sizeof(int));
+    }
+    for (int i = vector->current_size; i > index; --i) {
+
+    }
+}
 
 void pop_back(vector_t *vector)
 {
