@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stm32746g_discovery.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -175,13 +175,19 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  BSP_LED_Init(LED_GREEN);
+  BSP_PB_Init(BUTTON_TAMPER, 0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if(BSP_PB_GetState(BUTTON_TAMPER == 0)){
+		  BSP_LED_On(LED_GREEN);
+
+	  }
+	  BSP_LED_Off(LED_GREEN);
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
 
