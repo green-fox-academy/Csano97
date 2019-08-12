@@ -183,11 +183,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(BSP_PB_GetState(BUTTON_TAMPER == 0)){
-		  BSP_LED_On(LED_GREEN);
-
+	  while(BSP_PB_GetState(BUTTON_TAMPER == 0)){
+		  BSP_LED_Toggle(LED_GREEN);
+		  HAL_Delay(125);
 	  }
-	  BSP_LED_Off(LED_GREEN);
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
 
