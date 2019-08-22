@@ -89,6 +89,9 @@ modules.xml
 # Sonarlint plugin
 .idea/sonarlint
 
+#ceedling
+build/
+
 # End of https://www.gitignore.io/api/clion+all
 #start of eclipse
 Debug/
