@@ -45,18 +45,16 @@
 /* Private variables ---------------------------------------------------------*/
 
 osThreadId defaultTaskHandle;
-osThreadId ThreadRipper1Handle;
-osThreadId ThreadRipper2Handle;
+osThreadId BlinkingLedHandle;
 /* USER CODE BEGIN PV */
-int counter = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 void StartDefaultTask(void const * argument);
-void StartThreadRipper1(void const * argument);
-void StartThreadRipper2(void const * argument);
+void StartBlinkingLed(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -82,6 +80,7 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -120,13 +119,9 @@ int main(void)
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-  /* definition and creation of ThreadRipper1 */
-  osThreadDef(ThreadRipper1, StartThreadRipper1, osPriorityNormal, 0, 128);
-  ThreadRipper1Handle = osThreadCreate(osThread(ThreadRipper1), NULL);
-
-  /* definition and creation of ThreadRipper2 */
-  osThreadDef(ThreadRipper2, StartThreadRipper2, osPriorityNormal, 0, 128);
-  ThreadRipper2Handle = osThreadCreate(osThread(ThreadRipper2), NULL);
+  /* definition and creation of BlinkingLed */
+  osThreadDef(BlinkingLed, StartBlinkingLed, osPriorityNormal, 0, 128);
+  BlinkingLedHandle = osThreadCreate(osThread(BlinkingLed), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -205,14 +200,20 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOI, GREEN_LED_Pin|RED_LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : GREEN_LED_Pin RED_LED_Pin */
-  GPIO_InitStruct.Pin = GREEN_LED_Pin|RED_LED_Pin;
+  /*Configure GPIO pin : GREEN_LED_Pin */
+  GPIO_InitStruct.Pin = GREEN_LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
+  HAL_GPIO_Init(GREEN_LED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : BUTTON_Pin */
+  GPIO_InitStruct.Pin = BUTTON_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(BUTTON_GPIO_Port, &GPIO_InitStruct);
 
 }
 
@@ -239,58 +240,22 @@ void StartDefaultTask(void const * argument)
   /* USER CODE END 5 */ 
 }
 
-/* USER CODE BEGIN Header_StartThreadRipper1 */
+/* USER CODE BEGIN Header_StartBlinkingLed */
 /**
-* @brief Function implementing the ThreadRipper1 thread.
+* @brief Function implementing the BlinkingLed thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartThreadRipper1 */
-void StartThreadRipper1(void const * argument)
+/* USER CODE END Header_StartBlinkingLed */
+void StartBlinkingLed(void const * argument)
 {
-  /* USER CODE BEGIN StartThreadRipper1 */
+  /* USER CODE BEGIN StartBlinkingLed */
   /* Infinite loop */
   for(;;)
   {
-	  for (int i = 0; i < 25; ++i) {
-		  HAL_GPIO_TogglePin(GPIOI, GREEN_LED_Pin);
-	    osDelay(200);
-	}
-	  HAL_GPIO_WritePin(GPIOI, GREEN_LED_Pin, GPIO_PIN_RESET);
-	  osThreadSuspend(ThreadRipper1Handle);
-
-	  for (int j = 0; j < 5; ++j) {
-	 		  HAL_GPIO_TogglePin(GPIOI, GREEN_LED_Pin);
-	 	    osDelay(1000);
-	 	}
-	  HAL_GPIO_WritePin(GPIOI, GREEN_LED_Pin, GPIO_PIN_RESET);
-	  osThreadResume(ThreadRipper2Handle);
+    osDelay(1);
   }
-  /* USER CODE END StartThreadRipper1 */
-}
-
-/* USER CODE BEGIN Header_StartThreadRipper2 */
-/**
-* @brief Function implementing the ThreadRipper2 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartThreadRipper2 */
-void StartThreadRipper2(void const * argument)
-{
-  /* USER CODE BEGIN StartThreadRipper2 */
-  /* Infinite loop */
-  for(;;)
-  {
-	for(int i = 0; i < 20; i++){
-		HAL_GPIO_TogglePin(GPIOI, RED_LED_Pin);
-		osDelay(500);
-	}
-	HAL_GPIO_WritePin(GPIOI, RED_LED_Pin, GPIO_PIN_RESET);
-	osThreadResume(ThreadRipper1Handle);
-	osThreadSuspend(ThreadRipper2Handle);
-  }
-  /* USER CODE END StartThreadRipper2 */
+  /* USER CODE END StartBlinkingLed */
 }
 
 /**
