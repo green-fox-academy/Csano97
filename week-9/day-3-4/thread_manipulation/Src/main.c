@@ -48,7 +48,7 @@ osThreadId defaultTaskHandle;
 osThreadId ThreadRipper1Handle;
 osThreadId ThreadRipper2Handle;
 /* USER CODE BEGIN PV */
-
+int counter = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -200,20 +200,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOI_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GREEN_LED_Pin|RED_LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOI, GREEN_LED_Pin|RED_LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : GREEN_LED_Pin RED_LED_Pin */
   GPIO_InitStruct.Pin = GREEN_LED_Pin|RED_LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
 }
 
@@ -253,7 +253,19 @@ void StartThreadRipper1(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  for (int i = 0; i < 25; ++i) {
+		  HAL_GPIO_TogglePin(GPIOI, GREEN_LED_Pin);
+	    osDelay(200);
+	}
+	  HAL_GPIO_WritePin(GPIOI, GREEN_LED_Pin, GPIO_PIN_RESET);
+	  osThreadSuspend(ThreadRipper1Handle);
+
+	  for (int j = 0; j < 5; ++j) {
+	 		  HAL_GPIO_TogglePin(GPIOI, GREEN_LED_Pin);
+	 	    osDelay(1000);
+	 	}
+	  HAL_GPIO_WritePin(GPIOI, GREEN_LED_Pin, GPIO_PIN_RESET);
+	  osThreadResume(ThreadRipper2Handle);
   }
   /* USER CODE END StartThreadRipper1 */
 }
@@ -271,7 +283,13 @@ void StartThreadRipper2(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	for(int i = 0; i < 20; i++){
+		HAL_GPIO_TogglePin(GPIOI, RED_LED_Pin);
+		osDelay(500);
+	}
+	HAL_GPIO_WritePin(GPIOI, RED_LED_Pin, GPIO_PIN_RESET);
+	osThreadResume(ThreadRipper1Handle);
+	osThreadSuspend(ThreadRipper2Handle);
   }
   /* USER CODE END StartThreadRipper2 */
 }
