@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -29,7 +29,9 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef enum directions {
+	UP, DOWN, LEFT, RIGHT
+} direction_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -47,8 +49,13 @@
 I2C_HandleTypeDef hi2c1;
 
 osThreadId defaultTaskHandle;
+osThreadId SnakeMoveHandle;
+osThreadId DrawSnakeHandle;
 /* USER CODE BEGIN PV */
-
+int snake_x = 0;
+int snake_y = 0;
+direction_t facing = UP;
+uint8_t led_array[8];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,34 +63,34 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 void StartDefaultTask(void const * argument);
+void StartSnakeMove(void const * argument);
+void StartDrawSnake(void const * argument);
 
 /* USER CODE BEGIN PFP */
 void clear_led_matrix();
-void set_led_matrix(const uint8_t* data);
+void set_led_matrix(uint8_t* data);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void clear_led_matrix(){
-  uint8_t buff[2];
+void clear_led_matrix() {
+	uint8_t buff[2];
 
-  for(int i=0; i<16; i++)
-  {
-	  buff[0] = i;
-	  buff[1] = 0x00;
-	  HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_LEDMATRIX, buff, 2, 100);
-  }
+	for (int i = 0; i < 16; i++) {
+		buff[0] = i;
+		buff[1] = 0x00;
+		HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_LEDMATRIX, buff, 2, 100);
+	}
 }
 
-void set_led_matrix(const uint8_t* data){
+void set_led_matrix(uint8_t* data) {
 	clear_led_matrix();
 	uint8_t buff[2];
 
-	for(int i=0; i<8; i++)
-	{
-		  buff[0] = i*2;
-		  buff[1] = (data[i] >> 1) | (data[i] << 7);
-		  HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_LEDMATRIX, buff, 2, 100);
+	for (int i = 0; i < 8; i++) {
+		buff[0] = i * 2;
+		buff[1] = (data[i] >> 1) | (data[i] << 7);
+		HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_LEDMATRIX, buff, 2, 100);
 	}
 }
 
@@ -120,33 +127,32 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  //init LED matrix
-  uint8_t init1 = 0b00100001;
-  uint8_t init2 = 0b10000001;
+	//init LED matrix
+	uint8_t init1 = 0b00100001;
+	uint8_t init2 = 0b10000001;
 
-  HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_LEDMATRIX, &init1, 1, 100);
-  HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_LEDMATRIX, &init2, 1, 100);
+	HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_LEDMATRIX, &init1, 1, 100);
+	HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_LEDMATRIX, &init2, 1, 100);
 
-  //data matrix
-  const uint8_t data[] = { 0x30, 0x66, 0xc6, 0x80, 0x80, 0xc6, 0x66, 0x30 };
-  //{ 0x60, 0x90, 0x1e, 0x05, 0x05, 0x1e, 0x90, 0x60 };
+	//data matrix
+
 
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+	/* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
+	/* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
+	/* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+	/* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -154,8 +160,16 @@ int main(void)
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
+  /* definition and creation of SnakeMove */
+  osThreadDef(SnakeMove, StartSnakeMove, osPriorityNormal, 0, 128);
+  SnakeMoveHandle = osThreadCreate(osThread(SnakeMove), NULL);
+
+  /* definition and creation of DrawSnake */
+  osThreadDef(DrawSnake, StartDrawSnake, osPriorityNormal, 0, 128);
+  DrawSnakeHandle = osThreadCreate(osThread(DrawSnake), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+	/* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
@@ -165,16 +179,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	  set_led_matrix(data);
-		  HAL_Delay(500);
-		  clear_led_matrix();
-		  HAL_Delay(500);
+	while (1) {
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -279,36 +289,141 @@ static void MX_I2C1_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
+
+  /*Configure GPIO pins : BUTT_DOWN_Pin BUTT_RIGHT_Pin BUTT_LEFT_Pin BUTT_UP_Pin */
+  GPIO_InitStruct.Pin = BUTT_DOWN_Pin|BUTT_RIGHT_Pin|BUTT_LEFT_Pin|BUTT_UP_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	if(GPIO_Pin == BUTT_DOWN_Pin){
+		facing = DOWN;
+		osThreadResume(SnakeMoveHandle);
+	}
+	if(GPIO_Pin == BUTT_UP_Pin){
+		facing = UP;
+		osThreadResume(SnakeMoveHandle);
+	}
+	if(GPIO_Pin == BUTT_LEFT_Pin){
+		facing = LEFT;
+		osThreadResume(SnakeMoveHandle);
+	}
+	if(GPIO_Pin == BUTT_RIGHT_Pin){
+		facing = RIGHT;
+		osThreadResume(SnakeMoveHandle);
+	}
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used 
-  * @retval None
-  */
+ * @brief  Function implementing the defaultTask thread.
+ * @param  argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
 
   /* USER CODE BEGIN 5 */
+	/* Infinite loop */
+	for (;;) {
+		osDelay(1);
+	}
+  /* USER CODE END 5 */ 
+}
+
+/* USER CODE BEGIN Header_StartSnakeMove */
+/**
+* @brief Function implementing the SnakeMove thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartSnakeMove */
+void StartSnakeMove(void const * argument)
+{
+  /* USER CODE BEGIN StartSnakeMove */
   /* Infinite loop */
   for(;;)
   {
+	  switch (facing){
+	  case UP:
+		  if(snake_y >= 7){
+			  snake_y = 0;
+		  }
+		  snake_y++;
+		  osDelay(100);
+		  break;
+	  case DOWN:
+		  if(snake_y <= 0){
+			  snake_y = 7;
+		  }
+		  snake_y--;
+		  osDelay(100);
+		  break;
+	  case LEFT:
+		  if(snake_x >= 7){
+			  snake_x = 0;
+		  }
+		  snake_x++;
+		  osDelay(100);
+		  break;
+	  case RIGHT:
+		  if(snake_x <= 0){
+			  snake_x = 7;
+		  }
+		  snake_x--;
+		  osDelay(100);
+		  break;
+	  }
     osDelay(1);
+    osThreadResume(DrawSnakeHandle);
+    osThreadSuspend(SnakeMoveHandle);
   }
-  /* USER CODE END 5 */ 
+  /* USER CODE END StartSnakeMove */
+}
+
+/* USER CODE BEGIN Header_StartDrawSnake */
+/**
+* @brief Function implementing the DrawSnake thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartDrawSnake */
+void StartDrawSnake(void const * argument)
+{
+  /* USER CODE BEGIN StartDrawSnake */
+  /* Infinite loop */
+  for(;;)
+  {
+	  led_array[snake_x] |= 1<<snake_y;
+    set_led_matrix(led_array);
+    osDelay(1000);
+    clear_led_matrix();
+
+    osThreadResume(SnakeMoveHandle);
+    osThreadSuspend(DrawSnakeHandle);
+  }
+  /* USER CODE END StartDrawSnake */
 }
 
 /**
@@ -339,7 +454,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
+	/* User can add his own implementation to report the HAL error return state */
 
   /* USER CODE END Error_Handler_Debug */
 }
