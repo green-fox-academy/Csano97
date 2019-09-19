@@ -32,6 +32,11 @@
 typedef enum directions {
 	UP, DOWN, LEFT, RIGHT
 } direction_t;
+typedef enum gamestate{
+	START,
+	GAME,
+	GAME_OVER
+}game_state_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
